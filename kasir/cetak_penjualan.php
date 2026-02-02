@@ -45,7 +45,7 @@ body{
 
 <div class="center">
 <b>Toko Aurora</b><br>
-Jl. RAYA KALIGETAS No. 1<br>
+Jl. Boja-Kaliwungu No. 1<br>
 ====================
 </div>
 
@@ -74,7 +74,7 @@ TOTAL : Rp <?= number_format($total); ?>
 
 <div class="center">
 Terima Kasih<br>
-Selamat Belanja 😊
+Telah berbelanja di Toko Aurora
 </div>
 
 </div>
