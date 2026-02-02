@@ -53,7 +53,7 @@ include '../koneksi.php';
                     <td>Rp. <?= number_format($d['total_harga']); ?></td>
                     <td>
                         <a target="_blank"
-                           href="cetak_penjualan.php?id_jual=<?= $d['id_jual']; ?>"
+                           href="cetak_penjualan.php?tgl_jual=<?= $d['tgl_jual']; ?>"
                            class="btn btn-xs btn-warning">
                            Cetak
                         </a>

@@ -1,89 +1,82 @@
 <?php
-session_start();
 include '../koneksi.php';
+session_start();
 
-if (!isset($_GET['id_jual'])) {
-    die('ID Jual tidak ditemukan');
-}
+$user_id = $_SESSION['user_id'];
 
-$id_jual = $_GET['id_jual'];
+// ambil tanggal dari klik cetak struk
+$tgl = $_GET['tgl_jual'];
 
-$q = mysqli_query($koneksi,"
-    SELECT penjualan.*, barang.nama_barang, barang.harga_jual, user.user_nama
-    FROM penjualan
-    JOIN barang ON penjualan.id_barang = barang.id_barang
-    JOIN user ON penjualan.user_id = user.user_id
-    WHERE penjualan.id_jual = '$id_jual'
-");
+// ambil data kasir
+$user = mysqli_fetch_array(
+    mysqli_query($koneksi,"SELECT * FROM user WHERE user_id='$user_id'")
+);
 
-$d = mysqli_fetch_assoc($q);
-
-if (!$d) {
-    die('Data tidak ditemukan');
-}
-
-$jumlah = 0;
-if ($d['harga_jual'] > 0) {
-    $jumlah = $d['total_harga'] / $d['harga_jual'];
-}
+// ambil semua barang dari transaksi user di tanggal itu
+$data = mysqli_query($koneksi,"SELECT penjualan.*, barang.nama_barang, barang.harga_jual FROM penjualan JOIN barang ON penjualan.id_barang = barang.id_barang WHERE penjualan.tgl_jual='$tgl' AND penjualan.user_id='$user_id'");
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Struk Penjualan</title>
-    <style>
-        body {
-            font-family: monospace;
-            font-size: 12px;
-        }
-        .struk {
-            width: 280px;
-        }
-        hr {
-            border: 1px dashed #000;
-        }
-        .right {
-            text-align: right;
-        }
-        .center {
-            text-align: center;
-        }
-    </style>
+<title>Struk Penjualan</title>
+<style>
+body{
+    font-family: monospace;
+    font-size: 12px;
+}
+.struk{
+    width: 220px;
+    margin: auto;
+}
+.center{
+    text-align: center;
+}
+.line{
+    border-top: 1px dashed #000;
+    margin: 5px 0;
+}
+</style>
 </head>
+
 <body onload="window.print()">
 
 <div class="struk">
-    <div class="center">
-        <strong>TOKO AURORA</strong><br>
-        STRUK PENJUALAN<br>
-        =====================
-    </div>
 
-    Invoice : <?= $d['id_jual']; ?><br>
-    Tanggal : <?= $d['tgl_jual']; ?><br>
-    Kasir   : <?= $d['user_nama']; ?><br>
+<div class="center">
+<b>Toko Aurora</b><br>
+Jl. RAYA KALIGETAS No. 1<br>
+====================
+</div>
 
-    <hr>
+Tanggal : <?= $tgl ?><br>
+Kasir   : <?= $user['user_nama']; ?>
 
-    <?= $d['nama_barang']; ?><br>
-    <?= $jumlah; ?> x <?= number_format($d['harga_jual']); ?>
-    <span class="right" style="float:right;">
-        <?= number_format($d['total_harga']); ?>
-    </span>
+<div class="line"></div>
 
-    <hr>
+<?php
+$total = 0;
+while($d = mysqli_fetch_array($data)){
+    $qty = $d['total_harga'] / $d['harga_jual']; // hitung jumlah barang
+    $total += $d['total_harga'];
+?>
+<?= $d['nama_barang']; ?><br>
+<?= $qty; ?> x <?= number_format($d['harga_jual']); ?>
+&nbsp;&nbsp;<?= number_format($d['total_harga']); ?>
+<br>
+<?php } ?>
 
-    TOTAL
-    <span class="right" style="float:right;">
-        <?= number_format($d['total_harga']); ?>
-    </span>
+<div class="line"></div>
 
-    <br><br>
-    <div class="center">
-        Terima kasih<br>
-        Telah berbelanja di Toko Aurora
-    </div>
+TOTAL : Rp <?= number_format($total); ?>
+
+<div class="line"></div>
+
+<div class="center">
+Terima Kasih<br>
+Selamat Belanja 😊
+</div>
+
 </div>
 
 </body>
